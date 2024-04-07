@@ -1,18 +1,18 @@
 import pygame as p
-from classes.gameState import GameState
-from classes.move import Move
+from files.gameState import GameState
+from files.move import Move
+from files.hightLightSQ import hightLightSQ
 from extra.consts import WIDTH,HEIGHT,MAX_FPS,SQ_SIZE,WHITE_PIECES,BLACK_PIECES
-from functions.loadImages import loadImages
-from functions.drawBoard import drawBoard
-from functions.getValidMoves import getValidMoves
-from functions.drawPieces import drawPieces
+from files.loadImages import loadImages
+from files.drawBoard import drawBoard
+from files.drawPieces import drawPieces
 
 def main():
     p.init()
     screen=p.display.set_mode((WIDTH,HEIGHT))
     clock=p.time.Clock()
     gs=GameState()
-    validMoves=getValidMoves(gs)
+    validMoves=gs.getValidMoves()
     vmMade=False
     loadImages()
     running=True
@@ -20,6 +20,7 @@ def main():
     playerClicks=[]
     while running:
         drawBoard(screen)
+        hightLightSQ(screen,gs,validMoves,sqSelected)
         drawPieces(screen,gs.board)
         for e in p.event.get():
             if e.type==p.QUIT:
@@ -48,7 +49,7 @@ def main():
                         playerClicks.append(sqSelected)
                 if len(playerClicks)==2:
                     move=Move(playerClicks[0],playerClicks[1],gs.board)
-                    if move.pcMoved[1]=="Q" and abs(move.edCol-move.stCol)==2:
+                    if move.pcMoved[1]=="K" and abs(move.edCol-move.stCol)==2:
                         move=Move(playerClicks[0],playerClicks[1],gs.board,isCastleMove=True)
                     if gs.epsPossible!=():
                         move=Move(playerClicks[0],playerClicks[1],gs.board,True)
@@ -63,7 +64,7 @@ def main():
                             playerClicks=[sqSelected]
                             continue
         if vmMade:
-            validMoves=getValidMoves(gs)
+            validMoves=gs.getValidMoves()
             vmMade=False
         clock.tick(MAX_FPS)
         p.display.flip()

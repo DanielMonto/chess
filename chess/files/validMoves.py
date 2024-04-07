@@ -1,4 +1,4 @@
-from classes.move import Move
+from files.move import Move
 def addVM(sr,sc,er,ec,bd,ms,eptMv=False,isCastleMove=False):
     ms.append(Move((sr, sc), (er, ec), bd,eptMv,isCastleMove))
 
@@ -89,17 +89,5 @@ def getKingMoves(row,col,gs,vMoves):
         edCol=col+dirs[d][1]
         if 0<=edRow and edRow<8 and edCol>=0 and edCol<8:
             edSq=gs.board[edRow][edCol]
-            if edSq!=alyc:
+            if edSq[0]!=alyc:
                 addVM(row,col,edRow,edCol,gs.board,vMoves)
-def getCastleMoves(row,col,gs,vMoves):
-    if gs.sqUnderAttack((row,col)):
-        return None
-    if (gs.whiteToMove and gs.curCastlingRights.wks) or ((not gs.whiteToMove) and gs.curCastlingRights.bks):
-        if gs.board[row][col+1]=="--" and gs.board[row][col+2]=="--":
-            if (not gs.sqUnderAttack((row,col+1))) and not gs.sqUnderAttack((row,col+2)):
-                addVM(row,col,row,col+2,gs.board,vMoves,isCastleMove=True)
-    if (gs.whiteToMove and gs.curCastlingRights.wqs) or ((not gs.whiteToMove) and gs.curCastlingRights.bqs):
-        if gs.board[row][col-1]=="--" and gs.board[row][col-2]=="--" and gs.board[row][col-3]=="--":
-            if (not gs.sqUnderAttack((row,col-1))) and not gs.sqUnderAttack((row,col-2)):
-                addVM(row,col,row,col-2,gs.board,vMoves,isCastleMove=True)
-    return
