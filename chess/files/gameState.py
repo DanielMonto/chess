@@ -102,8 +102,6 @@ class GameState:
                         self.board[7][3]="--"
                         self.board[7][0]="wR"
             if len(self.moveLog)>0:
-                if self.moveLog[-1].pcMoved[1]=="p" and abs( self.moveLog[-1].edRow- self.moveLog[-1].stRow)==2:
-                    self.epsPossible=((self.moveLog[-1].stRow+self.moveLog[-1].edRow)//2,self.moveLog[-1].edCol)
                 if (move.pcMoved[1]=="p" and move.stCol==move.edCol):
                     self.board[move.stRow][move.stCol]="wp" if self.whiteToMove else "bp"
                     self.board[move.edRow][move.edCol]="--"

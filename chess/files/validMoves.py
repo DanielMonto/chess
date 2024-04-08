@@ -30,19 +30,11 @@ def getPawnMoves(row,col,gs,vMoves):
                     addVM(row,col,row+2,col,gs.board,vMoves)
             addVM(row,col,row+1,col,gs.board,vMoves)
         if col<7:
-            if gs.board[row+1][col+1][0]=="w":
+            if gs.board[row+1][col+1][0]=="w" or (row+1,col+1)==gs.epsPossible:
                 addVM(row,col,row+1,col+1,gs.board,vMoves)
-            elif (row+1,col+1)==gs.epsPossible:
-                if len(gs.moveLog)>0:
-                    if gs.moveLog[-1].stRow==7 and abs(gs.moveLog[-1].edRow-gs.moveLog[-1].stRow)==2:
-                        addVM(row,col,row+1,col+1,gs.board,vMoves,epMv=True)
         if col>0:
-            if gs.board[row+1][col-1][0]=="w":
+            if gs.board[row+1][col-1][0]=="w" or (row+1,col-1)==gs.epsPossible:
                 addVM(row,col,row+1,col-1,gs.board,vMoves)
-            elif (row+1,col-1)==gs.epsPossible:
-                if len(gs.moveLog)>0:
-                    if gs.moveLog[-1].stRow==7 and abs(gs.moveLog[-1].edRow-gs.moveLog[-1].stRow)==2:
-                        addVM(row,col,row+1,col-1,gs.board,vMoves,epMv=True)
 def getRookMoves(row,col,gs,vMoves):
     enc="b" if gs.whiteToMove else "w"
     dirs=((-1,0),(0,-1),(1,0),(0,1))
