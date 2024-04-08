@@ -1,7 +1,6 @@
 import pygame as p
 from files.gameState import GameState
 from files.move import Move
-from files.animateMove import animateMove
 from files.hightLightSQ import hightLightSQ
 from extra.consts import WIDTH,HEIGHT,MAX_FPS,SQ_SIZE,WHITE_PIECES,BLACK_PIECES
 from files.loadImages import loadImages
@@ -42,6 +41,7 @@ def main():
                     sqSelected=(row,col)
                     if (len(playerClicks)==1 and gs.whiteToMove and gs.board[row][col][0]=="w") or (len(playerClicks)==1 and gs.board[row][col][0]=="b" and not gs.whiteToMove):
                         playerClicks=[sqSelected]
+                        continue
                     if (gs.board[row][col]=="--" and len(playerClicks)==0) or (gs.board[row][col][0]=="b" and gs.whiteToMove and len(playerClicks)==0) or (gs.board[row][col][0]=="w" and len(playerClicks)==0 and not gs.whiteToMove):
                         sqSelected=()
                         playerClicks=[]
@@ -50,8 +50,6 @@ def main():
                         playerClicks.append(sqSelected)
                 if len(playerClicks)==2:
                     move=Move(playerClicks[0],playerClicks[1],gs.board)
-                    if move.pcMoved[1]=="K" and abs(move.edRow-move.stRow)==2:
-                        move=Move(playerClicks[0],playerClicks[1],gs.board,isCastleMove=True)
                     if gs.epsPossible!=():
                         move=Move(playerClicks[0],playerClicks[1],gs.board,epMv=True)
                     if (gs.whiteToMove and move.pcMoved in WHITE_PIECES) or ((not gs.whiteToMove) and move.pcMoved in BLACK_PIECES):
@@ -66,7 +64,6 @@ def main():
                             playerClicks=[]
                             continue
         if vmMade:
-            #animateMove(gs.moveLog[-1],screen,gs,clock)
             validMoves=gs.getValidMoves()
             vmMade=False
         clock.tick(MAX_FPS)

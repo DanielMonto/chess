@@ -122,17 +122,17 @@ class GameState:
         if curK==WHITE_KING:
             if WKS_CASTLE:
                 if (self.board[curK[0]][curK[1]+1]=="--" and not self.sqUnderAttack((curK[0],curK[1]+1))) and self.board[curK[0]][curK[1]+2]=="--" and  not self.sqUnderAttack((curK[0],curK[1]+2)):
-                    vml.append(Move(curK,(curK[0],curK[1]+2),self.board,isCastleMove=True))
+                    vml.append(Move(curK,(curK[0],curK[1]+2),self.board))
             if WQS_CASTLE:
                 if (not self.sqUnderAttack((curK[0],curK[1]-1))) and not self.sqUnderAttack((curK[0],curK[1]-2)) and self.board[curK[0]][curK[1]-3]=="--" and self.board[curK[0]][curK[1]-2]=="--" and self.board[curK[0]][curK[1]-1]=="--":
-                    vml.append(Move(curK,(curK[0],curK[1]-2),self.board,isCastleMove=True))
+                    vml.append(Move(curK,(curK[0],curK[1]-2),self.board))
         elif curK==BLACK_KING:
             if BKS_CASTLE:
                 if (not self.sqUnderAttack((curK[0],curK[1]+1))) and not self.sqUnderAttack((curK[0],curK[1]+2)) and self.board[curK[0]][curK[1]+2]=="--" and self.board[curK[0]][curK[1]+1]=="--":
-                    vml.append(Move(curK,(curK[0],curK[1]+2),self.board,isCastleMove=True))
+                    vml.append(Move(curK,(curK[0],curK[1]+2),self.board))
             if BQS_CASTLE:
                 if (not self.sqUnderAttack((curK[0],curK[1]-1))) and not self.sqUnderAttack((curK[0],curK[1]-2)) and self.board[curK[0]][curK[1]-3]=="--" and self.board[curK[0]][curK[1]-2]=="--" and self.board[curK[0]][curK[1]-1]=="--":
-                    vml.append(Move(curK,(curK[0],curK[1]-2),self.board,isCastleMove=True))
+                    vml.append(Move(curK,(curK[0],curK[1]-2),self.board))
     def getValidMoves(self):
         global BKS_CASTLE,BQS_CASTLE,WKS_CASTLE,WQS_CASTLE
         tEptPos=self.epsPossible

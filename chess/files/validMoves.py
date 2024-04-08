@@ -1,6 +1,6 @@
 from files.move import Move
-def addVM(sr,sc,er,ec,bd,ms,epMv=False,isCastleMove=False):
-    ms.append(Move((sr, sc), (er, ec), bd,epMv,isCastleMove))
+def addVM(sr,sc,er,ec,bd,ms,epMv=False):
+    ms.append(Move((sr, sc), (er, ec), bd,epMv))
 
 def getPawnMoves(row,col,gs,vMoves):
     if gs.whiteToMove and gs.board[row][col][0]=="w": 
