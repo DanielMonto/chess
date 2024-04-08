@@ -21,7 +21,6 @@ class GameState:
         global WHITE_KING,BLACK_KING,BKS_CASTLE,BQS_CASTLE,WKS_CASTLE,WQS_CASTLE
         self.board[move.edRow][move.edCol]=move.pcMoved
         self.board[move.stRow][move.stCol]="--"
-        self.rightCastleLog.append((BKS_CASTLE,BQS_CASTLE,WKS_CASTLE,WQS_CASTLE))
         self.moveLog.append(move)
         self.whiteToMove=not self.whiteToMove
         if move.isCastleMove:
@@ -49,10 +48,10 @@ class GameState:
             BLACK_KING=(move.edRow,move.edCol)
         if move.isPawnPromotion:
             self.board[move.edRow][move.edCol]=move.pcMoved[0]+"Q"
-        if move.eptMv:
+        if move.epMv:
             self.board[move.stRow][move.edCol]="--"
         if move.pcMoved[1]=="p" and abs(move.stRow-move.edRow)==2:
-            self.epsPossible=((move.stRow+move.edRow)//2,move.stCol)
+            self.epsPossible=((move.stRow+move.edRow)//2,move.edCol)
         else:
             self.epsPossible=()
         if move.pcMoved[1]=="R" and (BKS_CASTLE or BQS_CASTLE or WKS_CASTLE or WQS_CASTLE):
@@ -66,6 +65,7 @@ class GameState:
                     BKS_CASTLE=False
                 elif move.stCol==0:
                     BQS_CASTLE=False
+        self.rightCastleLog.append((BKS_CASTLE,BQS_CASTLE,WKS_CASTLE,WQS_CASTLE))
     def unTurn(self):
         self.whiteToMove=not self.whiteToMove
     def undoMove(self):
@@ -77,6 +77,15 @@ class GameState:
             self.board[move.stRow][move.stCol]=move.pcMoved
             self.board[move.edRow][move.edCol]=move.pcCaptured
             self.whiteToMove=not self.whiteToMove
+            if move.pcMoved[1]=="p" and abs(move.edRow-move.stRow)==2:
+                self.epsPossible=()
+            if move.epMv:
+                self.board[move.edRow][move.edCol]="--"
+                self.board[move.stRow][move.edCol]=move.pcCaptured
+            if move.pcMoved=="wK":
+                WHITE_KING=(move.stRow,move.stCol)
+            elif move.pcMoved=="bK":
+                BLACK_KING=(move.stRow,move.stCol)
             if move.isCastleMove:
                 if move.stRow==0:
                     if move.edCol==6:
@@ -92,16 +101,10 @@ class GameState:
                     elif move.edCol==2:
                         self.board[7][3]="--"
                         self.board[7][0]="wR"
-            if move.pcMoved=="wK":
-                WHITE_KING=(move.stRow,move.stCol)
-            elif move.pcMoved=="bK":
-                BLACK_KING=(move.stRow,move.stCol)
-            if move.eptMv:
-                self.board[move.edRow][move.edCol]="--"
-                self.board[move.stRow][move.edCol]=move.pcCaptured
-                self.epsPossible=(move.edRow,move.edCol)
-            if move.pcMoved[1]=="p" and abs(move.stRow-move.edRow)==2:
-                self.epsPossible=()
+            if len(self.moveLog)>0:
+                if (move.pcMoved[1]=="p" and abs(move.edRow-move.stRow)==2) and (self.moveLog[-1].pcMoved[1]=="p" and abs(self.moveLog[-1].edRow-self.moveLog[-1].stRow)==2):
+                    self.board[move.stRow][move.stCol]="wp" if self.whiteToMove else "bp"
+                    self.board[move.edRow][move.edCol]="--"
     def sqUnderAttack(self,sq):
         self.whiteToMove=not self.whiteToMove
         oppMVS=getAllPossibleMoves(self)
@@ -150,7 +153,7 @@ class GameState:
         else:
             self.ckMt(False)
             self.stMt(False)
-        self.setEpsPos(tEptPos)
+        self.epsPossible=tEptPos
         WKS_CASTLE,WQS_CASTLE,BKS_CASTLE,BQS_CASTLE=tCastleRights
         self.getCastleMoves(VM)
         return VM

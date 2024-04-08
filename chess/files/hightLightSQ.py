@@ -1,5 +1,5 @@
 import pygame as p
-from extra.consts import SQ_SIZE,SQ_SELECTED_COLOR,SQ_SELECTED_MOVES_COLOR
+from extra.consts import SQ_SIZE,SQ_SELECTED_COLOR,SQ_SELECTED_MOVES_COLOR,LAST_MOVE_COLOR
 
 def hightLightSQ(screen,gs,vms,sqSelected):
     if sqSelected!=():

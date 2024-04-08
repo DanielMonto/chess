@@ -1,6 +1,7 @@
 import pygame as p
 from files.gameState import GameState
 from files.move import Move
+from files.animateMove import animateMove
 from files.hightLightSQ import hightLightSQ
 from extra.consts import WIDTH,HEIGHT,MAX_FPS,SQ_SIZE,WHITE_PIECES,BLACK_PIECES
 from files.loadImages import loadImages
@@ -49,10 +50,10 @@ def main():
                         playerClicks.append(sqSelected)
                 if len(playerClicks)==2:
                     move=Move(playerClicks[0],playerClicks[1],gs.board)
-                    if move.pcMoved[1]=="K" and abs(move.edCol-move.stCol)==2:
+                    if move.pcMoved[1]=="K" and abs(move.edRow-move.stRow)==2:
                         move=Move(playerClicks[0],playerClicks[1],gs.board,isCastleMove=True)
                     if gs.epsPossible!=():
-                        move=Move(playerClicks[0],playerClicks[1],gs.board,True)
+                        move=Move(playerClicks[0],playerClicks[1],gs.board,epMv=True)
                     if (gs.whiteToMove and move.pcMoved in WHITE_PIECES) or ((not gs.whiteToMove) and move.pcMoved in BLACK_PIECES):
                         for i in range(len(validMoves)):
                             if move == validMoves[i]:
@@ -61,9 +62,11 @@ def main():
                                 sqSelected=()
                                 playerClicks=[]
                         if not vmMade:
-                            playerClicks=[sqSelected]
+                            sqSelected=()
+                            playerClicks=[]
                             continue
         if vmMade:
+            #animateMove(gs.moveLog[-1],screen,gs,clock)
             validMoves=gs.getValidMoves()
             vmMade=False
         clock.tick(MAX_FPS)

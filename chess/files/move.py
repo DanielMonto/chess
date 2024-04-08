@@ -4,7 +4,7 @@ class Move:
     rowsToRanks = {v: k for k, v in ranksToRows.items()}
     filesToCols = {"a": 0,"b": 1,"c": 2,"d": 3,"e": 4,"f": 5,"g": 6,"h": 7}
     colsToFiles = {v: k for k, v in filesToCols.items()}
-    def __init__(self,startSq,endSq,board,eptMv=False,isCastleMove=False):
+    def __init__(self,startSq,endSq,board,epMv=False,isCastleMove=False):
         self.stRow=startSq[0]
         self.stCol=startSq[1]
         self.edRow=endSq[0]
@@ -14,8 +14,8 @@ class Move:
         self.pcCaptured=board[self.edRow][self.edCol]
         self.moveId=self.stRow*1000+self.stCol*100+self.edRow*10+self.edCol
         self.isPawnPromotion=(self.pcMoved=="wp" and self.edRow==0)or(self.pcMoved=="bp" and self.edRow==7)
-        self.eptMv=eptMv
-        if eptMv:
+        self.epMv=epMv
+        if epMv:
             self.pcCaptured="wp" if self.pcMoved=="bp" else "bp"
     def __str__(self):
         if self.pcCaptured!="--":

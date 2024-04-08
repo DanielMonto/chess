@@ -1,38 +1,48 @@
 from files.move import Move
-def addVM(sr,sc,er,ec,bd,ms,eptMv=False,isCastleMove=False):
-    ms.append(Move((sr, sc), (er, ec), bd,eptMv,isCastleMove))
+def addVM(sr,sc,er,ec,bd,ms,epMv=False,isCastleMove=False):
+    ms.append(Move((sr, sc), (er, ec), bd,epMv,isCastleMove))
 
 def getPawnMoves(row,col,gs,vMoves):
     if gs.whiteToMove and gs.board[row][col][0]=="w": 
         if gs.board[row-1][col]=="--":
-            if gs.board[row-2][col]=="--":
-                addVM(row,col,row-2,col,gs.board,vMoves)
+            if row==6:
+                if gs.board[row-2][col]=="--":
+                    addVM(row,col,row-2,col,gs.board,vMoves)
             addVM(row,col,row-1,col,gs.board,vMoves)
         if col<7:
             if gs.board[row-1][col+1][0]=="b":
                 addVM(row,col,row-1,col+1,gs.board,vMoves)
             elif (row-1,col+1)==gs.epsPossible:
-                addVM(row,col,row-1,col+1,gs.board,vMoves,True)
+                if len(gs.moveLog)>0:
+                    if gs.moveLog[-1].stRow==1 and abs(gs.moveLog[-1].edRow-gs.moveLog[-1].stRow)==2:
+                        addVM(row,col,row-1,col+1,gs.board,vMoves,epMv=True)
         if col>0:
             if gs.board[row-1][col-1][0]=="b":
                 addVM(row,col,row-1,col-1,gs.board,vMoves)
             elif (row-1,col-1)==gs.epsPossible:
-                addVM(row,col,row-1,col-1,gs.board,vMoves,True)
+                if len(gs.moveLog)>0:
+                    if gs.moveLog[-1].stRow==1 and abs(gs.moveLog[-1].edRow-gs.moveLog[-1].stRow)==2:
+                        addVM(row,col,row-1,col-1,gs.board,vMoves,epMv=True)
     elif (not gs.whiteToMove) and gs.board[row][col]=="bp":
         if gs.board[row+1][col]=="--":
-            if gs.board[row+2][col]=="--":
-                addVM(row,col,row+2,col,gs.board,vMoves)
+            if row==1:
+                if gs.board[row+2][col]=="--":
+                    addVM(row,col,row+2,col,gs.board,vMoves)
             addVM(row,col,row+1,col,gs.board,vMoves)
         if col<7:
             if gs.board[row+1][col+1][0]=="w":
                 addVM(row,col,row+1,col+1,gs.board,vMoves)
             elif (row+1,col+1)==gs.epsPossible:
-                addVM(row,col,row+1,col+1,gs.board,vMoves,True)
+                if len(gs.moveLog)>0:
+                    if gs.moveLog[-1].stRow==7 and abs(gs.moveLog[-1].edRow-gs.moveLog[-1].stRow)==2:
+                        addVM(row,col,row+1,col+1,gs.board,vMoves,epMv=True)
         if col>0:
             if gs.board[row+1][col-1][0]=="w":
                 addVM(row,col,row+1,col-1,gs.board,vMoves)
             elif (row+1,col-1)==gs.epsPossible:
-                addVM(row,col,row+1,col-1,gs.board,vMoves,True)
+                if len(gs.moveLog)>0:
+                    if gs.moveLog[-1].stRow==7 and abs(gs.moveLog[-1].edRow-gs.moveLog[-1].stRow)==2:
+                        addVM(row,col,row+1,col-1,gs.board,vMoves,epMv=True)
 def getRookMoves(row,col,gs,vMoves):
     enc="b" if gs.whiteToMove else "w"
     dirs=((-1,0),(0,-1),(1,0),(0,1))
