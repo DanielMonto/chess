@@ -1,10 +1,19 @@
-from extra.consts import INITIAL_BOARD,WHITE_KING,BLACK_KING,BKS_CASTLE,BQS_CASTLE,WKS_CASTLE,WQS_CASTLE
+from extra.consts import WHITE_KING,BLACK_KING,BKS_CASTLE,BQS_CASTLE,WKS_CASTLE,WQS_CASTLE
 from .move import Move
 from .getValidMoves import getAllPossibleMoves
 
 class GameState:
     def __init__(self):
-        self.board=INITIAL_BOARD
+        self.board=[
+            ["bR","bN","bB","bQ","bK","bB","bN","bR"],
+            ["bp","bp","bp","bp","bp","bp","bp","bp"],
+            ["--","--","--","--","--","--","--","--"],
+            ["--","--","--","--","--","--","--","--"],
+            ["--","--","--","--","--","--","--","--"],
+            ["--","--","--","--","--","--","--","--"],
+            ["wp","wp","wp","wp","wp","wp","wp","wp"],
+            ["wR","wN","wB","wQ","wK","wB","wN","wR"]
+        ]
         self.whiteToMove=True
         self.moveLog=[]
         self.rightCastleLog=[(BKS_CASTLE,BQS_CASTLE,WKS_CASTLE,WQS_CASTLE)]
@@ -13,10 +22,6 @@ class GameState:
         self.epsPossible=()
     def setEpsPos(self,p):
         self.epsPossible=p
-    def ckMt(self,p):
-        self.checkMate=p
-    def stMt(self,p):
-        self.staleMate=p
     def makeMove(self,move:Move):
         global WHITE_KING,BLACK_KING,BKS_CASTLE,BQS_CASTLE,WKS_CASTLE,WQS_CASTLE
         self.board[move.edRow][move.edCol]=move.pcMoved
@@ -147,12 +152,12 @@ class GameState:
             self.undoMove()
         if len(VM)==0:
             if self.inCheck():
-                self.ckMt(True)
+                self.checkMate=True
             else:
-                self.stMt(True)
+                self.staleMate=True
         else:
-            self.ckMt(False)
-            self.stMt(False)
+            self.checkMate=False
+            self.staleMate=False
         self.epsPossible=tEptPos
         WKS_CASTLE,WQS_CASTLE,BKS_CASTLE,BQS_CASTLE=tCastleRights
         self.getCastleMoves(VM)
