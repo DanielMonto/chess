@@ -18,4 +18,4 @@ def animateMove(move,screen,gs,clock):
             screen.blit(IMAGES[move.pcCaptured],edSq)
         screen.blit(IMAGES[move.pcMoved],p.Rect(col*SQ_SIZE,row*SQ_SIZE,SQ_SIZE,SQ_SIZE))
         p.display.flip()
-        clock.tick(30)
+        clock.tick(100)

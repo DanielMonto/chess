@@ -1,6 +1,7 @@
 import pygame as p
 from files.gameState import GameState
 from files.move import Move
+from files.animateMove import animateMove
 from files.hightLightSQ import hightLightSQ
 from files.drawText import drawText
 from extra.consts import WIDTH,HEIGHT,MAX_FPS,SQ_SIZE,WHITE_PIECES,BLACK_PIECES,WKS_CASTLE,WQS_CASTLE,BKS_CASTLE,BQS_CASTLE
@@ -19,6 +20,7 @@ def main():
     loadImages(gs)
     running=True
     gameOver=False
+    animate=False
     sqSelected=()
     playerClicks=[]
     while running:
@@ -46,29 +48,32 @@ def main():
                             continue
                         else:
                             playerClicks.append(sqSelected)
-                    if len(playerClicks)==2:
-                        move=Move(playerClicks[0],playerClicks[1],gs.board)
-                        if gs.epsPossible!=():
-                            move=Move(playerClicks[0],playerClicks[1],gs.board,epMv=True)
-                        if (gs.whiteToMove and move.pcMoved in WHITE_PIECES) or ((not gs.whiteToMove) and move.pcMoved in BLACK_PIECES):
-                            for i in range(len(validMoves)):
-                                if move == validMoves[i]:
-                                    gs.makeMove(move)
-                                    vmMade=True
+                        if len(playerClicks)==2:
+                            move=Move(playerClicks[0],playerClicks[1],gs.board)
+                            if gs.epsPossible!=():
+                                move=Move(playerClicks[0],playerClicks[1],gs.board,epMv=True)
+                            if (gs.whiteToMove and move.pcMoved in WHITE_PIECES) or ((not gs.whiteToMove) and move.pcMoved in BLACK_PIECES):
+                                for i in range(len(validMoves)):
+                                    if move == validMoves[i]:
+                                        gs.makeMove(move)
+                                        vmMade=True
+                                        sqSelected=()
+                                        animate=True
+                                        playerClicks=[]
+                                if not vmMade:
                                     sqSelected=()
                                     playerClicks=[]
-                            if not vmMade:
-                                sqSelected=()
-                                playerClicks=[]
-                                continue
+                                    continue
             elif e.type==p.KEYDOWN:
                 if e.key == p.K_z:
+                    animate=False
                     gs.undoMove()
                     sqSelected=()
                     playerClicks=[]
                     gameOver=False
                     vmMade=True
                 if e.key==p.K_r:
+                    animate=False
                     gameOver=False
                     BKS_CASTLE,BQS_CASTLE,WKS_CASTLE,WQS_CASTLE=True,True,True,True
                     gs=GameState()
@@ -78,6 +83,8 @@ def main():
                     gameOver=False
                     vmMade=False
         if vmMade:
+            if animate:
+                animateMove(gs.moveLog[-1],screen,gs,clock)
             validMoves=gs.getValidMoves()
             vmMade=False
         clock.tick(MAX_FPS)

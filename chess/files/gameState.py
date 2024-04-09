@@ -24,9 +24,9 @@ class GameState:
         self.epsPossible=p
     def makeMove(self,move:Move):
         global WHITE_KING,BLACK_KING,BKS_CASTLE,BQS_CASTLE,WKS_CASTLE,WQS_CASTLE
+        self.moveLog.append(move)
         self.board[move.edRow][move.edCol]=move.pcMoved
         self.board[move.stRow][move.stCol]="--"
-        self.moveLog.append(move)
         self.whiteToMove=not self.whiteToMove
         if move.isCastleMove:
             if move.stRow==0:
@@ -53,7 +53,7 @@ class GameState:
             BLACK_KING=(move.edRow,move.edCol)
         if move.isPawnPromotion:
             self.board[move.edRow][move.edCol]=move.pcMoved[0]+"Q"
-        if move.epMv:
+        if move.pcMoved[1]=="p" and move.stCol!=move.edCol and move.pcCaptured=="--":
             self.board[move.stRow][move.edCol]="--"
         if move.pcMoved[1]=="p" and abs(move.stRow-move.edRow)==2:
             self.epsPossible=((move.stRow+move.edRow)//2,move.edCol)
@@ -84,9 +84,13 @@ class GameState:
             self.whiteToMove=not self.whiteToMove
             if move.pcMoved[1]=="p" and abs(move.edRow-move.stRow)==2:
                 self.epsPossible=()
-            if move.epMv:
+            if move.pcMoved[1]=="p" and move.stCol!=move.edCol and move.pcCaptured=="--":
                 self.board[move.edRow][move.edCol]="--"
-                self.board[move.stRow][move.edCol]=move.pcCaptured
+                self.board[move.stRow][move.edCol]="wp" if  not self.whiteToMove else "bp"
+            if len(self.moveLog)>0:
+                if (move.pcMoved[1]=="p" and move.stCol==move.edCol):
+                    self.board[move.stRow][move.stCol]=move.pcMoved
+                    self.board[move.edRow][move.edCol]="--"
             if move.pcMoved=="wK":
                 WHITE_KING=(move.stRow,move.stCol)
             elif move.pcMoved=="bK":
@@ -106,10 +110,6 @@ class GameState:
                     elif move.edCol==2:
                         self.board[7][3]="--"
                         self.board[7][0]="wR"
-            if len(self.moveLog)>0:
-                if (move.pcMoved[1]=="p" and move.stCol==move.edCol):
-                    self.board[move.stRow][move.stCol]="wp" if self.whiteToMove else "bp"
-                    self.board[move.edRow][move.edCol]="--"
     def sqUnderAttack(self,sq):
         self.whiteToMove=not self.whiteToMove
         oppMVS=getAllPossibleMoves(self)
@@ -141,6 +141,7 @@ class GameState:
     def getValidMoves(self):
         global BKS_CASTLE,BQS_CASTLE,WKS_CASTLE,WQS_CASTLE
         tEptPos=self.epsPossible
+        curBoard=self.board
         tCastleRights=WKS_CASTLE,WQS_CASTLE,BKS_CASTLE,BQS_CASTLE
         VM=getAllPossibleMoves(self)
         for i in range(len(VM)-1,-1,-1):
@@ -159,6 +160,7 @@ class GameState:
             self.checkMate=False
             self.staleMate=False
         self.epsPossible=tEptPos
+        self.board=curBoard
         WKS_CASTLE,WQS_CASTLE,BKS_CASTLE,BQS_CASTLE=tCastleRights
         self.getCastleMoves(VM)
         return VM

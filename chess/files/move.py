@@ -17,8 +17,6 @@ class Move:
         self.isCastleMove=False
         if self.pcMoved[1]=="K" and abs(self.edCol-self.stCol)==2:
             self.isCastleMove=True
-        if epMv:
-            self.pcCaptured="wp" if self.pcMoved=="bp" else "bp"
         if self.edCol==self.stCol and self.pcMoved[1]=="p":
             self.pcCaptured="--"
     def __str__(self):
