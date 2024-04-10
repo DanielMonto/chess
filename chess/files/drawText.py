@@ -1,5 +1,5 @@
 import pygame as p
-from extra.consts import BRD_LIGHT_COLOR,BRD_DARK_COLOR,WIDTH,HEIGHT
+from extra.consts import WIDTH,HEIGHT
 
 def drawText(screen,text):
     font=p.font.SysFont("Helvica",32,italic=True)

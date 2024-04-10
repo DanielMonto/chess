@@ -4,9 +4,10 @@ from files.move import Move
 from files.animateMove import animateMove
 from files.hightLightSQ import hightLightSQ
 from files.drawText import drawText
-from extra.consts import WIDTH,HEIGHT,MAX_FPS,SQ_SIZE,WHITE_PIECES,BLACK_PIECES,WKS_CASTLE,WQS_CASTLE,BKS_CASTLE,BQS_CASTLE
+from extra.consts import WIDTH,HEIGHT,MAX_FPS,SQ_SIZE,WHITE_PIECES,BLACK_PIECES,WKS_CASTLE,WQS_CASTLE,BKS_CASTLE,BQS_CASTLE,WHITE_HUMAN,BLACK_HUMAN
 from files.loadImages import loadImages
 from files.drawBoard import drawBoard
+from chessia.funcs import findRandomMove,findBestMove,findBestMoveAGL
 from files.drawPieces import drawPieces
 
 gs=GameState()
@@ -24,6 +25,7 @@ def main():
     sqSelected=()
     playerClicks=[]
     while running:
+        humanTurn=(gs.whiteToMove and WHITE_HUMAN)or(not gs.whiteToMove and BLACK_HUMAN)
         drawBoard(screen)
         hightLightSQ(screen,gs,validMoves,sqSelected)
         drawPieces(screen,gs.board)
@@ -31,7 +33,7 @@ def main():
             if e.type==p.QUIT:
                 running=False
             elif e.type==p.MOUSEBUTTONDOWN:
-                if not gameOver:
+                if not gameOver and humanTurn:
                     location=p.mouse.get_pos()
                     col=location[0]//SQ_SIZE
                     row=location[1]//SQ_SIZE
@@ -68,6 +70,7 @@ def main():
                 if e.key == p.K_z:
                     animate=False
                     gs.undoMove()
+                    humanTurn=(gs.whiteToMove and WHITE_HUMAN)or(not gs.whiteToMove and BLACK_HUMAN)
                     sqSelected=()
                     playerClicks=[]
                     gameOver=False
@@ -82,15 +85,21 @@ def main():
                     playerClicks=[]
                     gameOver=False
                     vmMade=False
+                    gs.checkMate=False
+                    gs.staleMate=False
+        if not gameOver and not humanTurn:
+            AIMv=findBestMoveAGL(gs,validMoves)
+            if AIMv==None:
+                AIMv=findRandomMove(validMoves)
+            gs.makeMove(AIMv)
+            vmMade=True
+            animate=True
         if vmMade:
             if animate:
                 animateMove(gs.moveLog[-1],screen,gs,clock)
             validMoves=gs.getValidMoves()
             vmMade=False
         clock.tick(MAX_FPS)
-        drawBoard(screen)
-        hightLightSQ(screen,gs,validMoves,sqSelected)
-        drawPieces(screen,gs.board)
         if gs.checkMate:
             gameOver=True
             if gs.whiteToMove:

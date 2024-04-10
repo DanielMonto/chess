@@ -110,6 +110,8 @@ class GameState:
                     elif move.edCol==2:
                         self.board[7][3]="--"
                         self.board[7][0]="wR"
+        self.checkMate=False
+        self.staleMate=False
     def sqUnderAttack(self,sq):
         self.whiteToMove=not self.whiteToMove
         oppMVS=getAllPossibleMoves(self)
