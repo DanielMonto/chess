@@ -20,14 +20,48 @@ class GameState:
         self.checkMate=False
         self.staleMate=False
         self.epsPossible=()
+        self.epPossLog=[self.epsPossible]
     def setEpsPos(self,p):
         self.epsPossible=p
-    def makeMove(self,move:Move):
+    def updateCastlingRights(self,move):
         global WHITE_KING,BLACK_KING,BKS_CASTLE,BQS_CASTLE,WKS_CASTLE,WQS_CASTLE
+        if move.pcCaptured[1]=="R":
+            if move.edRow==7:
+                if move.edCol==7:
+                    WKS_CASTLE=False
+                elif move.edCol==0:
+                    WQS_CASTLE=False
+            elif move.edRow==0:
+                if move.edCol==7:
+                    BKS_CASTLE=False
+                elif move.edCol==0:
+                    BQS_CASTLE=False
+        if move.pcMoved=="wK":
+            WKS_CASTLE=False
+            WQS_CASTLE=False
+            WHITE_KING=(move.edRow,move.edCol)
+        elif move.pcMoved=="bK":
+            BKS_CASTLE=False
+            BQS_CASTLE=False
+            BLACK_KING=(move.edRow,move.edCol)
+        if move.pcMoved[1]=="R":
+            if move.stRow==7:
+                if move.stCol==7:
+                    WKS_CASTLE=False
+                elif move.stCol==0:
+                    WQS_CASTLE=False
+            elif move.stRow==0:
+                if move.stCol==7:
+                    BKS_CASTLE=False
+                elif move.stCol==0:
+                    BQS_CASTLE=False
+    def makeMove(self,move:Move):
+        global BKS_CASTLE,BQS_CASTLE,WKS_CASTLE,WQS_CASTLE
         self.moveLog.append(move)
         self.board[move.edRow][move.edCol]=move.pcMoved
         self.board[move.stRow][move.stCol]="--"
         self.whiteToMove=not self.whiteToMove
+        self.updateCastlingRights(move)
         if move.isCastleMove:
             if move.stRow==0:
                 if move.edCol==6:
@@ -43,14 +77,6 @@ class GameState:
                 elif move.edCol==2:
                     self.board[7][3]="wR"
                     self.board[7][0]="--"
-        if move.pcMoved=="wK":
-            WKS_CASTLE=False
-            WQS_CASTLE=False
-            WHITE_KING=(move.edRow,move.edCol)
-        elif move.pcMoved=="bK":
-            BKS_CASTLE=False
-            BQS_CASTLE=False
-            BLACK_KING=(move.edRow,move.edCol)
         if move.isPawnPromotion:
             self.board[move.edRow][move.edCol]=move.pcMoved[0]+"Q"
         if move.pcMoved[1]=="p" and move.stCol!=move.edCol and move.pcCaptured=="--":
@@ -59,17 +85,7 @@ class GameState:
             self.epsPossible=((move.stRow+move.edRow)//2,move.edCol)
         else:
             self.epsPossible=()
-        if move.pcMoved[1]=="R" and (BKS_CASTLE or BQS_CASTLE or WKS_CASTLE or WQS_CASTLE):
-            if move.stRow==7:
-                if move.stCol==7:
-                    WKS_CASTLE=False
-                elif move.stCol==0:
-                    WQS_CASTLE=False
-            elif move.stRow==0:
-                if move.stCol==7:
-                    BKS_CASTLE=False
-                elif move.stCol==0:
-                    BQS_CASTLE=False
+        self.epPossLog.append(self.epsPossible)
         self.rightCastleLog.append((BKS_CASTLE,BQS_CASTLE,WKS_CASTLE,WQS_CASTLE))
     def unTurn(self):
         self.whiteToMove=not self.whiteToMove
@@ -77,13 +93,15 @@ class GameState:
         global WHITE_KING,BLACK_KING,BKS_CASTLE,BQS_CASTLE,WKS_CASTLE,WQS_CASTLE
         if len(self.moveLog)>0:
             move=self.moveLog.pop()
+            self.epPossLog.pop()
             self.rightCastleLog.pop()
+            self.epsPossible=self.epPossLog[-1]
             BKS_CASTLE,BQS_CASTLE,WKS_CASTLE,WQS_CASTLE=self.rightCastleLog[-1]
             self.board[move.stRow][move.stCol]=move.pcMoved
             self.board[move.edRow][move.edCol]=move.pcCaptured
             self.whiteToMove=not self.whiteToMove
             if move.pcMoved[1]=="p" and abs(move.edRow-move.stRow)==2:
-                self.epsPossible=()
+                self.board[move.stRow][move.stCol]="wp" if  self.whiteToMove else "bp"
             if move.pcMoved[1]=="p" and move.stCol!=move.edCol and move.pcCaptured=="--":
                 self.board[move.edRow][move.edCol]="--"
                 self.board[move.stRow][move.edCol]="wp" if  not self.whiteToMove else "bp"

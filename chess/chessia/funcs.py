@@ -68,8 +68,8 @@ def findBestMove(gs, vms):
 def findBestMoveAGL(gs,vms):
     global nextMove
     nextMove=None
-    random.shuffle(vms)
     depth=IA_DEPTH
+    random.shuffle(vms)
     findMoveNegaMaxAlphaBeta(gs,vms,depth,1 if gs.whiteToMove else -1,-CHECKMATE,CHECKMATE)
     return nextMove
 def findMoveMinMax(gs,vms,depth,wToMove):
