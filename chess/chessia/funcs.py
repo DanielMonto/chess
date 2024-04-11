@@ -1,5 +1,5 @@
 import random
-from extra.consts import PC_VALUES,IA_DEPTH
+from extra.consts import PC_VALUES,IA_DEPTH,PC_POSITIONS_SCORES
 
 CHECKMATE=999999
 STALEMATE=0
@@ -11,11 +11,10 @@ def scoreMaterial(board):
     for row in range(8):
         for col in range(8):
             pc=board[row][col]
-            if pc[1]!="K":
-                if pc[0]=="w":
-                    evaluation+=PC_VALUES[pc[1]]
-                elif pc[0]=="b":
-                    evaluation-=PC_VALUES[pc[1]]
+            if pc[0]=="w":
+                evaluation+=PC_VALUES[pc[1]]
+            elif pc[0]=="b":
+                evaluation-=PC_VALUES[pc[1]]
     return evaluation
 def scoreBoard(gs):
     if gs.checkMate:
@@ -29,11 +28,14 @@ def scoreBoard(gs):
     for row in range(8):
         for col in range(8):
             pc=gs.board[row][col]
-            if pc[1]!="K":
-                if pc[0]=="w":
-                    evaluation+=PC_VALUES[pc[1]]
-                elif pc[0]=="b":
-                    evaluation-=PC_VALUES[pc[1]]
+            if pc!="--":
+                turnMultiplier=1 if pc[0]=="w" else -1
+                pcPosScore=0
+                if pc[1]!="p":
+                    pcPosScore+=PC_POSITIONS_SCORES[pc[1]][row][col]
+                else:
+                    pcPosScore+=PC_POSITIONS_SCORES[pc][row][col]
+                evaluation+=turnMultiplier*(PC_VALUES[pc[1]]+pcPosScore*.1)
     return evaluation
 def findBestMove(gs, vms):
     turnMultiplier = 1 if gs.whiteToMove else -1
