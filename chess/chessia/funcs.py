@@ -36,7 +36,7 @@ def scoreBoard(gs):
                     pcPosScore+=PC_POSITIONS_SCORES[pc[1]][row][col]*.1
                 else:
                     pcPosScore+=PC_POSITIONS_SCORES[pc][row][col]*.1
-                evaluation+=turnMultiplier*(gs.vm[row][col]*.05+PC_VALUES[pc[1]]+pcPosScore*.1)
+                evaluation+=turnMultiplier*(gs.vm[row][col]*.03+PC_VALUES[pc[1]]+pcPosScore*.1)
     return evaluation
 def findBestMove(gs, vms):
     turnMultiplier = 1 if gs.whiteToMove else -1
