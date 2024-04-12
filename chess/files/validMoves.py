@@ -1,12 +1,7 @@
 from files.move import Move
 def addVM(gs,sr,sc,er,ec,bd,ms,epMv=False):
     curMove=Move((sr, sc), (er, ec), bd,epMv)
-    gs.makeMove(curMove)
-    gs.unTurn()
-    if not gs.inCheck():
-        ms.append(curMove)
-    gs.unTurn()
-    gs.undoMove()
+    ms.append(curMove)
 
 def getPawnMoves(row,col,gs,vMoves):
     if gs.whiteToMove and gs.board[row][col][0]=="w": 
@@ -96,12 +91,7 @@ def getKingMoves(row,col,gs,vMoves):
         edRow=row+d[0]
         edCol=col+d[1]
         if 0<=edRow and edRow<8 and edCol>=0 and edCol<8:
-            edSq=gs.board[edRow][edCol]
-            if edSq[0]==enc:
+            edSq=gs.board[edRow][edCol][0]
+            if edSq==enc or edSq=="-":
                 curMove=Move((row, col), (edRow, edCol), gs.board)
-                gs.makeMove(curMove)
-                gs.unTurn()
-                if not gs.sqUnderAttack((edRow,edCol)):
-                    vMoves.append(curMove)
-                gs.unTurn()
-                gs.undoMove()
+                vMoves.append(curMove)

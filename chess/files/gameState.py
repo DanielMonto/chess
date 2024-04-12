@@ -11,8 +11,8 @@ class GameState:
             ["--","--","--","--","--","--","--","--"],
             ["--","--","--","--","--","--","--","--"],
             ["--","--","--","--","wQ","--","--","--"],
-            ["wp","wp","wp","wp","wp","wp","wp","wp"],
-            ["wR","wN","wB","wQ","wK","wB","wN","wR"]
+            ["wp","wp","wp","wp","wN","wp","wp","wp"],
+            ["wR","wN","wB","wK","wR","wB","wN","wR"]
         ]
         self.whiteToMove=True
         self.moveLog=[]
@@ -141,24 +141,24 @@ class GameState:
             if sq[0]>1:
                 if sq[1]>0:
                     if self.board[sq[0]-1][sq[1]-1]=="bp":
-                        attacked=True
+                        return True
                 if sq[1]<7:
                     if self.board[sq[0]-1][sq[1]+1]=="bp":
-                        attacked=True
+                        return True
         elif enc=="w":
             if sq[0]<6:
                 if sq[1]>0:
                     if self.board[sq[0]-1][sq[1]-1]=="wp":
-                        attacked=True
+                        return True
                 if sq[1]<7:
                     if self.board[sq[0]-1][sq[1]+1]=="wp":
-                        attacked=True
+                        return True
         for d in knight_dirs:
             row=sq[0]+d[0]
             col=sq[1]+d[1]
             if 0<=row and row<8 and col>=0 and col<8:
                 if self.board[row][col]==f"{enc}N":
-                    attacked=True
+                    return True
         for d in line_dirs:
             for i in range(1,8):
                 row,col=sq[0]+d[0]*i,sq[1]+d[1]*i
@@ -166,9 +166,9 @@ class GameState:
                     pc=self.board[row][col]
                     if attacked:
                         break
-                    if pc[0]==enc and (pc[1]=="R" or pc[1]=="Q"):
-                        attacked=True
-                        break
+                    elif pc[0]==enc:
+                        if pc[1]=="R" or pc[1]=="Q":
+                            return True
                     elif pc[0]==alyc:
                         break
         for d in diag_dirs:
@@ -178,9 +178,9 @@ class GameState:
                     pc=self.board[row][col]
                     if attacked:
                         break
-                    if pc[0]==enc and (pc[1]=="B" or pc[1]=="Q"):
-                        attacked=True
-                        break
+                    elif pc[0]==enc:
+                        if pc[1]=="B" or pc[1]=="Q":
+                            return True
                     elif pc[0]==alyc:
                         break
         return attacked
@@ -210,6 +210,13 @@ class GameState:
         curBoard=self.board
         tCastleRights=WKS_CASTLE,WQS_CASTLE,BKS_CASTLE,BQS_CASTLE
         VM=getAllPossibleMoves(self)
+        for i in range(len(VM)-1,-1,-1):
+            self.makeMove(VM[i])
+            self.unTurn()
+            if self.inCheck():
+                VM.remove(VM[i])
+            self.unTurn()
+            self.undoMove()
         self.checkMate=False
         self.staleMate=False
         if len(VM)==0:
