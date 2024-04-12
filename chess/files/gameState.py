@@ -1,6 +1,6 @@
 from extra.consts import WHITE_KING,BLACK_KING,BKS_CASTLE,BQS_CASTLE,WKS_CASTLE,WQS_CASTLE
 from .move import Move
-from .getValidMoves import getAllPossibleMoves
+from .getValidMoves import getAllPossibleMoves,vm
 
 class GameState:
     def __init__(self):
@@ -13,6 +13,16 @@ class GameState:
             ["--","--","--","--","--","--","--","--"],
             ["wp","wp","wp","wp","wp","wp","wp","wp"],
             ["wR","wN","wB","wQ","wK","wB","wN","wR"]
+        ]
+        self.vm=[
+            [0,2,0,0,0,0,2,0],
+            [2,2,2,2,2,2,2,2],
+            [0,0,0,0,0,0,0,0],
+            [0,0,0,0,0,0,0,0],
+            [0,0,0,0,0,0,0,0],
+            [0,0,0,0,0,0,0,0],
+            [2,2,2,2,2,2,2,2],
+            [0,2,0,0,0,0,2,0]
         ]
         self.whiteToMove=True
         self.moveLog=[]
@@ -130,6 +140,22 @@ class GameState:
                         self.board[7][0]="wR"
         self.checkMate=False
         self.staleMate=False
+    def calcVM(self):
+        for row in range(8):
+            for col in range(8):
+                sq=self.board[row][col]
+                if sq!="--":
+                    movesFunctions={"p":vm.getPawnMoves,"R":vm.getRookMoves,"B":vm.getBishopMoves,"Q":vm.getQueenMoves,"N":vm.getNightMoves,"K":vm.getKingMoves}
+                    curPosMV=[]
+                    movesFunctions[sq[1]](row,col,self,curPosMV)
+                    for i in range(len(curPosMV)-1,-1,-1):
+                        self.makeMove(curPosMV[i])
+                        self.unTurn()
+                        if self.sqUnderAttack(WHITE_KING if self.whiteToMove else BLACK_KING):
+                            curPosMV.remove(curPosMV[i])
+                        self.unTurn()
+                        self.undoMove()
+                    self.vm[row][col]=len(curPosMV)
     def sqUnderAttack(self,sq):
         diag_dirs=((1,1),(-1,1),(-1,-1),(1,-1))
         line_dirs=((-1,0),(0,-1),(1,0),(0,1))

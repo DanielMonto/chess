@@ -7,6 +7,7 @@ def hightLightSQ(screen,gs,vms,sqSelected):
         surf.set_alpha(100)
         surf.fill(p.Color(LAST_MOVE_COLOR))
         screen.blit(surf,(SQ_SIZE*gs.moveLog[-1].edCol,SQ_SIZE*gs.moveLog[-1].edRow))
+        screen.blit(surf,(SQ_SIZE*gs.moveLog[-1].stCol,SQ_SIZE*gs.moveLog[-1].stRow))
     if sqSelected!=():
         row,col=sqSelected
         if gs.board[row][col][0]=="w" if gs.whiteToMove else "b":

@@ -25,6 +25,7 @@ def scoreBoard(gs):
     elif gs.staleMate:
         return STALEMATE
     evaluation=0
+    gs.calcVM()
     for row in range(8):
         for col in range(8):
             pc=gs.board[row][col]
@@ -32,10 +33,10 @@ def scoreBoard(gs):
                 turnMultiplier=1 if pc[0]=="w" else -1
                 pcPosScore=0
                 if pc[1]!="p":
-                    pcPosScore+=PC_POSITIONS_SCORES[pc[1]][row][col]
+                    pcPosScore+=PC_POSITIONS_SCORES[pc[1]][row][col]*.1
                 else:
-                    pcPosScore+=PC_POSITIONS_SCORES[pc][row][col]
-                evaluation+=turnMultiplier*(PC_VALUES[pc[1]]+pcPosScore*.1)
+                    pcPosScore+=PC_POSITIONS_SCORES[pc][row][col]*.1
+                evaluation+=turnMultiplier*(gs.vm[row][col]*.05+PC_VALUES[pc[1]]+pcPosScore*.1)
     return evaluation
 def findBestMove(gs, vms):
     turnMultiplier = 1 if gs.whiteToMove else -1
