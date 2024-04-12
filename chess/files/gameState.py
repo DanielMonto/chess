@@ -5,14 +5,14 @@ from .getValidMoves import getAllPossibleMoves
 class GameState:
     def __init__(self):
         self.board=[
-            ["bR","bN","bB","bN","bK","bN","bB","bR"],
+            ["bR","bN","bB","bQ","bK","bB","bN","bR"],
             ["bp","bp","bp","bp","bp","bp","bp","bp"],
             ["--","--","--","--","--","--","--","--"],
             ["--","--","--","--","--","--","--","--"],
             ["--","--","--","--","--","--","--","--"],
-            ["--","--","--","--","wQ","--","--","--"],
-            ["wp","wp","wp","wp","wN","wp","wp","wp"],
-            ["wR","wN","wB","wK","wR","wB","wN","wR"]
+            ["--","--","--","--","--","--","--","--"],
+            ["wp","wp","wp","wp","wp","wp","wp","wp"],
+            ["wR","wN","wB","wQ","wK","wB","wN","wR"]
         ]
         self.whiteToMove=True
         self.moveLog=[]
@@ -133,12 +133,11 @@ class GameState:
     def sqUnderAttack(self,sq):
         diag_dirs=((1,1),(-1,1),(-1,-1),(1,-1))
         line_dirs=((-1,0),(0,-1),(1,0),(0,1))
-        attacked=False
         knight_dirs=((-2,-1),(-2,1),(-1,2),(-1,-2),(1,-2),(1,2),(2,-1),(2,1))
         enc="b" if self.whiteToMove else "w"
         alyc="w" if self.whiteToMove else "b"
         if enc=="b":
-            if sq[0]>1:
+            if sq[0]>0: 
                 if sq[1]>0:
                     if self.board[sq[0]-1][sq[1]-1]=="bp":
                         return True
@@ -146,12 +145,12 @@ class GameState:
                     if self.board[sq[0]-1][sq[1]+1]=="bp":
                         return True
         elif enc=="w":
-            if sq[0]<6:
+            if sq[0]<7:
                 if sq[1]>0:
-                    if self.board[sq[0]-1][sq[1]-1]=="wp":
+                    if self.board[sq[0]+1][sq[1]-1]=="wp":
                         return True
                 if sq[1]<7:
-                    if self.board[sq[0]-1][sq[1]+1]=="wp":
+                    if self.board[sq[0]+1][sq[1]+1]=="wp": 
                         return True
         for d in knight_dirs:
             row=sq[0]+d[0]
@@ -164,11 +163,11 @@ class GameState:
                 row,col=sq[0]+d[0]*i,sq[1]+d[1]*i
                 if 0<=row and row<8 and col>=0 and col<8:
                     pc=self.board[row][col]
-                    if attacked:
-                        break
-                    elif pc[0]==enc:
+                    if pc[0]==enc:
                         if pc[1]=="R" or pc[1]=="Q":
                             return True
+                        else:
+                            break
                     elif pc[0]==alyc:
                         break
         for d in diag_dirs:
@@ -176,14 +175,14 @@ class GameState:
                 row,col=sq[0]+d[0]*i,sq[1]+d[1]*i
                 if 0<=row and row<8 and col>=0 and col<8:
                     pc=self.board[row][col]
-                    if attacked:
-                        break
-                    elif pc[0]==enc:
+                    if pc[0]==enc:
                         if pc[1]=="B" or pc[1]=="Q":
                             return True
+                        else:
+                            break
                     elif pc[0]==alyc:
                         break
-        return attacked
+        return False
     def inCheck(self):
         return self.sqUnderAttack(WHITE_KING) if self.whiteToMove else self.sqUnderAttack(BLACK_KING)
     def getCastleMoves(self,vml):
@@ -213,7 +212,7 @@ class GameState:
         for i in range(len(VM)-1,-1,-1):
             self.makeMove(VM[i])
             self.unTurn()
-            if self.inCheck():
+            if self.sqUnderAttack(WHITE_KING if self.whiteToMove else BLACK_KING):
                 VM.remove(VM[i])
             self.unTurn()
             self.undoMove()

@@ -74,10 +74,10 @@ def getBishopMoves(row,col,gs,vMoves):
                 edpc=gs.board[edRow][edCol]
                 if edpc=="--":
                     addVM(gs,row,col,edRow,edCol,gs.board,vMoves)
-                elif edpc[0]==enc:
+                if edpc[0]==enc:
                     addVM(gs,row,col,edRow,edCol,gs.board,vMoves)
                     break
-                else:
+                if edpc[0]=="w" if gs.whiteToMove else "b":
                     break
             else:
                 break
@@ -88,10 +88,17 @@ def getKingMoves(row,col,gs,vMoves):
     enc="b" if gs.whiteToMove else "w"
     dirs=((-1,0),(0,-1),(1,0),(0,1),(1,1),(-1,1),(-1,-1),(1,-1))
     for d in dirs:
-        edRow=row+d[0]
-        edCol=col+d[1]
-        if 0<=edRow and edRow<8 and edCol>=0 and edCol<8:
-            edSq=gs.board[edRow][edCol][0]
-            if edSq==enc or edSq=="-":
-                curMove=Move((row, col), (edRow, edCol), gs.board)
-                vMoves.append(curMove)
+        for i in range(1,2):
+            edRow=row+d[0]*i
+            edCol=col+d[1]*i
+            if 0<=edRow and edRow<8 and 0<=edCol and edCol<8:
+                edpc=gs.board[edRow][edCol]
+                if edpc=="--":
+                    addVM(gs,row,col,edRow,edCol,gs.board,vMoves)
+                elif edpc[0]==enc:
+                    addVM(gs,row,col,edRow,edCol,gs.board,vMoves)
+                    break
+                else:
+                    break
+            else:
+                break
