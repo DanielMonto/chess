@@ -5,12 +5,12 @@ from .getValidMoves import getAllPossibleMoves
 class GameState:
     def __init__(self):
         self.board=[
-            ["bR","bN","bB","bQ","bK","bB","bN","bR"],
+            ["bR","bN","bB","bN","bK","bN","bB","bR"],
             ["bp","bp","bp","bp","bp","bp","bp","bp"],
             ["--","--","--","--","--","--","--","--"],
             ["--","--","--","--","--","--","--","--"],
             ["--","--","--","--","--","--","--","--"],
-            ["--","--","--","--","--","--","--","--"],
+            ["--","--","--","--","wQ","--","--","--"],
             ["wp","wp","wp","wp","wp","wp","wp","wp"],
             ["wR","wN","wB","wQ","wK","wB","wN","wR"]
         ]
@@ -131,13 +131,59 @@ class GameState:
         self.checkMate=False
         self.staleMate=False
     def sqUnderAttack(self,sq):
-        self.whiteToMove=not self.whiteToMove
-        oppMVS=getAllPossibleMoves(self)
-        self.whiteToMove=not self.whiteToMove
-        for mv in oppMVS:
-            if mv.edRow==sq[0] and mv.edCol==sq[1]:
-                return True
-        return False
+        diag_dirs=((1,1),(-1,1),(-1,-1),(1,-1))
+        line_dirs=((-1,0),(0,-1),(1,0),(0,1))
+        attacked=False
+        knight_dirs=((-2,-1),(-2,1),(-1,2),(-1,-2),(1,-2),(1,2),(2,-1),(2,1))
+        enc="b" if self.whiteToMove else "w"
+        alyc="w" if self.whiteToMove else "b"
+        if enc=="b":
+            if sq[0]>1:
+                if sq[1]>0:
+                    if self.board[sq[0]-1][sq[1]-1]=="bp":
+                        attacked=True
+                if sq[1]<7:
+                    if self.board[sq[0]-1][sq[1]+1]=="bp":
+                        attacked=True
+        elif enc=="w":
+            if sq[0]<6:
+                if sq[1]>0:
+                    if self.board[sq[0]-1][sq[1]-1]=="wp":
+                        attacked=True
+                if sq[1]<7:
+                    if self.board[sq[0]-1][sq[1]+1]=="wp":
+                        attacked=True
+        for d in knight_dirs:
+            row=sq[0]+d[0]
+            col=sq[1]+d[1]
+            if 0<=row and row<8 and col>=0 and col<8:
+                if self.board[row][col]==f"{enc}N":
+                    attacked=True
+        for d in line_dirs:
+            for i in range(1,8):
+                row,col=sq[0]+d[0]*i,sq[1]+d[1]*i
+                if 0<=row and row<8 and col>=0 and col<8:
+                    pc=self.board[row][col]
+                    if attacked:
+                        break
+                    if pc[0]==enc and (pc[1]=="R" or pc[1]=="Q"):
+                        attacked=True
+                        break
+                    elif pc[0]==alyc:
+                        break
+        for d in diag_dirs:
+            for i in range(1,8):
+                row,col=sq[0]+d[0]*i,sq[1]+d[1]*i
+                if 0<=row and row<8 and col>=0 and col<8:
+                    pc=self.board[row][col]
+                    if attacked:
+                        break
+                    if pc[0]==enc and (pc[1]=="B" or pc[1]=="Q"):
+                        attacked=True
+                        break
+                    elif pc[0]==alyc:
+                        break
+        return attacked
     def inCheck(self):
         return self.sqUnderAttack(WHITE_KING) if self.whiteToMove else self.sqUnderAttack(BLACK_KING)
     def getCastleMoves(self,vml):
@@ -164,21 +210,13 @@ class GameState:
         curBoard=self.board
         tCastleRights=WKS_CASTLE,WQS_CASTLE,BKS_CASTLE,BQS_CASTLE
         VM=getAllPossibleMoves(self)
-        for i in range(len(VM)-1,-1,-1):
-            self.makeMove(VM[i])
-            self.unTurn()
-            if self.inCheck():
-                VM.remove(VM[i])
-            self.unTurn()
-            self.undoMove()
+        self.checkMate=False
+        self.staleMate=False
         if len(VM)==0:
             if self.inCheck():
                 self.checkMate=True
             else:
                 self.staleMate=True
-        else:
-            self.checkMate=False
-            self.staleMate=False
         self.epsPossible=tEptPos
         self.board=curBoard
         WKS_CASTLE,WQS_CASTLE,BKS_CASTLE,BQS_CASTLE=tCastleRights
